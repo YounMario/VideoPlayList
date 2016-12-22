@@ -14,6 +14,8 @@ public class ContentManager {
     private static ContentManager mContentManager;
     private SharedPreferences mShardPreferences;
 
+    private static final String KEY_BIT_RATE = "key_bit_rate";
+
 
     public static ContentManager getInstance() {
         if (mContentManager == null) {
@@ -50,6 +52,12 @@ public class ContentManager {
         editor.putFloat(key, value);
         editor.apply();
     }
+
+
+    public void setBandwidth(long bitrateEstimate) {
+        putLong(KEY_BIT_RATE, bitrateEstimate);
+    }
+
 
 
 }

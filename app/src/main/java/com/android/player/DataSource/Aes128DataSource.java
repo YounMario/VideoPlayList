@@ -4,12 +4,11 @@ import android.content.res.AssetManager;
 import android.net.Uri;
 
 import com.android.player.util.RotAlgo;
-import com.cleanmaster.util.CMLog;
+import com.example.videoplaylist.App;
 import com.google.android.exoplayer.C;
 import com.google.android.exoplayer.upstream.DataSpec;
 import com.google.android.exoplayer.upstream.UriDataSource;
 import com.google.android.exoplayer.util.Assertions;
-import com.keniu.security.MoSecurityApplication;
 
 import java.io.EOFException;
 import java.io.File;
@@ -34,7 +33,7 @@ public class Aes128DataSource implements UriDataSource {
     private static final String TAG = "Aes128DataSource";
 
     private String uriString;
-    private static AssetManager assetManager = MoSecurityApplication.getInstance().getAssets();
+    private static AssetManager assetManager = App.getInstance().getAssets();
     private CipherInputStream cipherInputStream;
     private InputStream inputStream;
 
@@ -114,7 +113,6 @@ public class Aes128DataSource implements UriDataSource {
         } catch (IOException e) {
             throw e;
         }
-        CMLog.i(TAG, "open dataSpec: " + dataSpec + ", return bytesRemaining: " + bytesRemaining);
         return bytesRemaining;
     }
 
@@ -125,7 +123,6 @@ public class Aes128DataSource implements UriDataSource {
 
     @Override
     public int read(byte[] buffer, int offset, int readLength) throws IOException {
-        CMLog.i(TAG, "read offset: " + offset + ", readLength: " + readLength);
         Assertions.checkState(cipherInputStream != null);
         int bytesRead = cipherInputStream.read(buffer, offset, readLength);
         if (bytesRead < 0) {

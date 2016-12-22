@@ -17,7 +17,7 @@ package com.google.android.exoplayer.upstream;
 
 import android.os.Handler;
 
-import com.cleanmaster.util.KLockerConfigMgr;
+import com.example.videoplaylist.manager.ContentManager;
 import com.google.android.exoplayer.util.Assertions;
 import com.google.android.exoplayer.util.Clock;
 import com.google.android.exoplayer.util.SlidingPercentile;
@@ -95,7 +95,7 @@ public final class DefaultBandwidthMeter implements BandwidthMeter {
       float bandwidthEstimateFloat = slidingPercentile.getPercentile(0.5f);
       bitrateEstimate = Float.isNaN(bandwidthEstimateFloat) ? NO_ESTIMATE
           : (long) bandwidthEstimateFloat;
-      KLockerConfigMgr.getInstance().setBandwidth(bitrateEstimate);
+      ContentManager.getInstance().setBandwidth(bitrateEstimate);
       notifyBandwidthSample(elapsedMs, bytesAccumulator, bitrateEstimate);
     }
     streamCount--;

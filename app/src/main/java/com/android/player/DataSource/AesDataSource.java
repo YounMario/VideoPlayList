@@ -5,12 +5,11 @@ import android.content.res.AssetManager;
 import android.net.Uri;
 
 import com.android.player.util.AesHelper;
-import com.cleanmaster.util.CMLog;
+import com.example.videoplaylist.App;
 import com.google.android.exoplayer.C;
 import com.google.android.exoplayer.upstream.DataSpec;
 import com.google.android.exoplayer.upstream.TransferListener;
 import com.google.android.exoplayer.upstream.UriDataSource;
-import com.keniu.security.MoSecurityApplication;
 
 import java.io.EOFException;
 import java.io.File;
@@ -30,7 +29,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class AesDataSource implements UriDataSource {
 
-    private static AssetManager assetManager = MoSecurityApplication.getInstance().getAssets();
+    private static AssetManager assetManager = App.getInstance().getAssets();
 
     private static final String TAG = AesDataSource.class.getSimpleName();
     private TransferListener listener;
@@ -121,7 +120,6 @@ public class AesDataSource implements UriDataSource {
         if (listener != null) {
             listener.onTransferStart();
         }
-        CMLog.i(TAG, "open dataSpec: " + dataSpec + ", return bytesRemaining: " + bytesRemaining);
         return bytesRemaining;
     }
 

@@ -9,11 +9,10 @@ import android.net.Uri;
 
 import com.android.player.util.IOUtils;
 import com.android.player.util.RotAlgo;
-import com.cleanmaster.util.CMLog;
+import com.example.videoplaylist.App;
 import com.google.android.exoplayer.C;
 import com.google.android.exoplayer.upstream.DataSpec;
 import com.google.android.exoplayer.upstream.UriDataSource;
-import com.keniu.security.MoSecurityApplication;
 
 import java.io.ByteArrayInputStream;
 import java.io.EOFException;
@@ -64,8 +63,6 @@ public final class EncryptedVideoDataSource implements UriDataSource {
             long time = System.currentTimeMillis();
             byte[] encryptedInputByteArray = IOUtils.toByteArray(encryptedInputStream);
             decByteArray = decrypt(encryptedInputByteArray);
-            CMLog.i(TAG, "decryption costs time: " + (System.currentTimeMillis() - time)
-                    + ", size: " + (decByteArray == null ? 0 : decByteArray.length));
             // byte[] reEcryptedByteArray = encrypt(encryptedInputByteArray);
         }  catch (IOException e) {
         }
@@ -84,7 +81,7 @@ public final class EncryptedVideoDataSource implements UriDataSource {
     private long bytesRemaining;
     private boolean opened;
 
-    private static AssetManager assetManager = MoSecurityApplication.getInstance().getAssets();
+    private static AssetManager assetManager = App.getInstance().getAssets();
     @Override
     public long open(DataSpec dataSpec) throws EncryptedVideoDataSourceException {
         try {
@@ -111,7 +108,6 @@ public final class EncryptedVideoDataSource implements UriDataSource {
             throw new EncryptedVideoDataSourceException(e);
         }
         opened = true;
-        CMLog.i(TAG, "open dataSpec: " + dataSpec + ", return bytesRemaining: " + bytesRemaining);
         return bytesRemaining;
     }
     @Override
