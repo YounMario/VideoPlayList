@@ -22,7 +22,6 @@ public class VideoInfo implements Parcelable {
     private int type;//视频类型 ：0 普通 1 广告
     private int categoryId;//视频分类 默认0
     private String videoLocalPath;//【本地字段】视频缓存路径
-    private int state; //【本地字段】视频播放状态：0 未播放、 1 已播放
 
     public VideoInfo() {
     }
@@ -38,7 +37,6 @@ public class VideoInfo implements Parcelable {
         this.type = in.readInt();
         this.categoryId = in.readInt();
         this.videoLocalPath = in.readString();
-        this.state = in.readInt();
     }
 
     @Override
@@ -53,7 +51,6 @@ public class VideoInfo implements Parcelable {
         dest.writeInt(type);
         dest.writeInt(categoryId);
         dest.writeString(videoLocalPath);
-        dest.writeInt(state);
     }
 
     public long getId() {
@@ -136,21 +133,6 @@ public class VideoInfo implements Parcelable {
         this.videoLocalPath = videoLocalPath;
     }
 
-    public int getState() {
-        return state;
-    }
-
-    public void setState(int state) {
-        this.state = state;
-    }
-
-    protected boolean isDownloaded() {
-        if (!TextUtils.isEmpty(videoLocalPath)) {
-            return new File(videoLocalPath).exists();
-        }
-        return false;
-    }
-
     @Override
     public String toString() {
         return "VideoInfo{" +
@@ -164,7 +146,6 @@ public class VideoInfo implements Parcelable {
                 ", type = " + type +
                 ", categoryId =" + categoryId +
                 ", videoLocalPath='" + videoLocalPath +
-                ", state=" + state +
                 '}';
     }
 

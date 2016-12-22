@@ -31,9 +31,6 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<VideoInfo> videoInfos = new ArrayList<>();
         for (int i=0;i<10;i++){
             VideoInfo info = new VideoInfo();
-            if (i % 2 == 0) {
-                info.setVideoLocalPath("/sdcard/yoyo.mp4");
-            }
             info.setTitle("dss");
             info.setVideoUrl("http://img.locker.cmcm.com/livelock/uservideo/90f1353176bc83dffe2f246eba496c7a");
             videoInfos.add(info);
@@ -43,6 +40,19 @@ public class MainActivity extends AppCompatActivity {
         mAdapter.setData(videoInfos);
         mAdapter.setLinearLayout(linearLayoutManager);
         mRecyclerView.addOnScrollListener(new PlayWindowScrollerListener(mAdapter));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mAdapter != null) {
+            mAdapter.onResume();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 
     @Override
