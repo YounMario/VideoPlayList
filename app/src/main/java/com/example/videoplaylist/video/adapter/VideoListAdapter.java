@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.videoplaylist.App;
 import com.example.videoplaylist.R;
 import com.example.videoplaylist.utils.FileUtils;
 import com.example.videoplaylist.video.bean.VideoInfo;
@@ -22,6 +23,7 @@ import com.example.videoplaylist.video.listener.VideoPlayListener;
 import com.example.videoplaylist.video.player.ExoVideoPlayManager;
 import com.example.videoplaylist.video.player.PlayableWindow;
 import com.example.videoplaylist.video.player.VideoPlayManager;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -218,6 +220,10 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
         });
 
         final ImageView imageView = (ImageView) window.getView(R.id.cover_image_view);
+        Picasso.with(App.getInstance())
+                .load(videoInfo.getThumbnailUrl())
+                .fit()
+                .into(imageView);
 
         final TextureView textureView = (TextureView) window.getView(R.id.textureView);
         textureView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
