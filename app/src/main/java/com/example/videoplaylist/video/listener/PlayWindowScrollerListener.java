@@ -5,7 +5,7 @@ import android.support.v7.widget.RecyclerView;
 
 
 import com.example.videoplaylist.video.player.PlayableWindow;
-import com.example.videoplaylist.video.player.VideoPlayManager;
+import com.example.videoplaylist.video.player.manager.VideoPlayManager;
 
 import java.util.ArrayList;
 

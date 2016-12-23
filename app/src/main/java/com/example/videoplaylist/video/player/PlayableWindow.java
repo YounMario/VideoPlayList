@@ -3,11 +3,14 @@ package com.example.videoplaylist.video.player;
 import android.view.Surface;
 import android.view.View;
 
+import com.example.videoplaylist.video.bean.VideoInfo;
+import com.example.videoplaylist.video.player.manager.VideoPlayManager;
+
 /**
  * Created by 龙泉 on 2016/10/19.
  */
 
-public interface PlayableWindow {
+public interface PlayableWindow<T> {
 
     boolean canPlay();
 
@@ -71,4 +74,14 @@ public interface PlayableWindow {
     void onFocus();
 
     void setSurface(Surface mSurface);
+
+    void setVideoPlayManager(VideoPlayManager videoPlayManager);
+
+    T getVideoItem();
+
+    void updateVideoItem(T videoItem);
+
+    boolean playActive();
+
+    void setPlayActive(boolean playActive);
 }

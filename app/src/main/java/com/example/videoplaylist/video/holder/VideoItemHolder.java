@@ -1,7 +1,9 @@
 package com.example.videoplaylist.video.holder;
 
 import android.animation.ObjectAnimator;
+import android.graphics.SurfaceTexture;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
@@ -9,9 +11,12 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.example.videoplaylist.R;
+import com.example.videoplaylist.video.adapter.VideoListAdapter;
 import com.example.videoplaylist.video.anim.AnimationUtils;
+import com.example.videoplaylist.video.bean.VideoInfo;
 import com.example.videoplaylist.video.player.ExoVideoPlayManager;
 import com.example.videoplaylist.video.player.PlayableWindow;
+import com.example.videoplaylist.video.player.manager.VideoPlayManager;
 import com.example.videoplaylist.video.utils.ThreadUtils;
 import com.example.videoplaylist.video.utils.ViewUitls;
 import com.example.videoplaylist.video.widget.VideoPlayerBottomBar;
@@ -21,7 +26,7 @@ import com.example.videoplaylist.video.widget.VideoPlayerBottomBar;
  * Created by 龙泉 on 2016/12/15.
  */
 
-public class VideoItemHolder extends RecyclerView.ViewHolder implements PlayableWindow {
+public class VideoItemHolder extends RecyclerView.ViewHolder implements PlayableWindow<VideoInfo> {
 
     private static final String TAG = "VideoItemHolder";
 
@@ -46,7 +51,10 @@ public class VideoItemHolder extends RecyclerView.ViewHolder implements Playable
     private ObjectAnimator playButtonAnimation;
     private Runnable mDelayHideRunnable;
 
-    private ExoVideoPlayManager mVideoPlayerManager;
+    private ExoVideoPlayManager mExoPlayer;
+    private VideoInfo mVideoItem;
+    private boolean mPlayActive;
+    private VideoPlayManager mVideoPlayManager;
 
     public VideoItemHolder(View itemView) {
         super(itemView);
@@ -61,8 +69,55 @@ public class VideoItemHolder extends RecyclerView.ViewHolder implements Playable
         videoPlayerBottomBar = (VideoPlayerBottomBar) itemView.findViewById(R.id.video_play_bottom_bar);
         frameCover = (FrameLayout) itemView.findViewById(R.id.frame_cover);
         ivLoading = (ImageView) itemView.findViewById(R.id.img_buffering);
-        mVideoPlayerManager = new ExoVideoPlayManager();
-        mVideoPlayerManager.setPlayableWindow(this);
+        mExoPlayer = new ExoVideoPlayManager();
+        mExoPlayer.setPlayableWindow(this);
+
+        textureView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
+            @Override
+            public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+                if (mVideoPlayManager.getCurrentPlayableWindow() == VideoItemHolder.this) {
+                    if (mSurface != null) {
+                        mSurface.release();
+                    }
+                    mSurface = new Surface(surface);
+                    VideoItemHolder.this.setSurface(mSurface);
+                    //只是为了第一次播放？
+                    if (mVideoPlayManager.getCurrentPlayableWindow().playActive()) {
+                        mVideoPlayManager.play();
+                    }
+                }
+            }
+
+            @Override
+            public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+
+            }
+
+            @Override
+            public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+                if (surface != null) {
+                    surface.release();
+                }
+                PlayableWindow currentWindow = mVideoPlayManager.getCurrentPlayableWindow();
+                if (currentWindow == VideoItemHolder.this) {
+                    Log.i(TAG, "is surface texture disdroyed:" + currentWindow.getWindowIndex() + " view:" + textureView);
+                    if (mSurface != null) {
+                        mSurface.release();
+                        mSurface = null;
+                    }
+                    Log.i("locker_news_videoplay", "on pause.......");
+                    if (currentWindow.isPlaying()) {
+                        mVideoPlayManager.stopPlay();
+                    }
+                }
+                return true;
+            }
+
+            @Override
+            public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+//                Log.i(TAG_TEXTURE, "is surface texture update:" + position);
+            }
+        });
     }
 
     public View getView(int resId) {
@@ -225,7 +280,7 @@ public class VideoItemHolder extends RecyclerView.ViewHolder implements Playable
 
     @Override
     public long getCurrentSeek() {
-        return mVideoPlayerManager.getCurrentSeek();
+        return mExoPlayer.getCurrentSeek();
     }
 
 
@@ -249,49 +304,74 @@ public class VideoItemHolder extends RecyclerView.ViewHolder implements Playable
     }
 
     private void releasePlayer() {
-        if (mVideoPlayerManager != null) {
-            mVideoPlayerManager.release();
+        if (mExoPlayer != null) {
+            mExoPlayer.release();
         }
     }
 
     @Override
     public void stopPlay() {
-        mVideoPlayerManager.stopPlay();
+        mExoPlayer.stopPlay();
     }
 
     @Override
     public boolean isPlaying() {
-        return mVideoPlayerManager.isPlaying();
+        return mExoPlayer.isPlaying();
     }
 
     @Override
     public void setUrl(String url) {
-        mVideoPlayerManager.setUrl(url);
+        mExoPlayer.setUrl(url);
     }
 
     @Override
     public void play() {
-        mVideoPlayerManager.play();
+        mExoPlayer.play();
     }
 
     @Override
     public void pause() {
-        mVideoPlayerManager.pause();
+        mExoPlayer.pause();
     }
 
     @Override
     public void resume() {
-        mVideoPlayerManager.resume();
+        mExoPlayer.resume();
     }
 
     @Override
     public void onFocus() {
-        mVideoPlayerManager.onFocus();
+        mExoPlayer.onFocus();
     }
 
     @Override
     public void setSurface(Surface mSurface) {
-        mVideoPlayerManager.setSurface(mSurface);
+        mExoPlayer.setSurface(mSurface);
+    }
+
+    @Override
+    public void setVideoPlayManager(VideoPlayManager videoPlayManager) {
+        this.mVideoPlayManager = videoPlayManager;
+    }
+
+    @Override
+    public VideoInfo getVideoItem() {
+        return mVideoItem;
+    }
+
+    @Override
+    public void updateVideoItem(VideoInfo videoItem) {
+        this.mVideoItem = videoItem;
+    }
+
+    @Override
+    public boolean playActive() {
+        return mPlayActive;
+    }
+
+    @Override
+    public void setPlayActive(boolean playActive) {
+        this.mPlayActive = playActive;
     }
 
     private void stopPlayButtonAnimation() {

@@ -1,5 +1,7 @@
-package com.example.videoplaylist.video.player;
+package com.example.videoplaylist.video.player.manager;
 
+
+import com.example.videoplaylist.video.player.PlayableWindow;
 
 /**
  * Created by 龙泉 on 2016/10/19.
@@ -20,4 +22,6 @@ public interface VideoPlayManager {
     void resume();
 
     void onScrollFinished(boolean isUp);
+
+    void release();
 }

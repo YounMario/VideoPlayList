@@ -9,6 +9,8 @@ import android.support.v7.widget.SimpleItemAnimator;
 import com.example.videoplaylist.video.adapter.VideoListAdapter;
 import com.example.videoplaylist.video.bean.VideoInfo;
 import com.example.videoplaylist.video.listener.PlayWindowScrollerListener;
+import com.example.videoplaylist.video.player.manager.DefaultVideoPlayManager;
+import com.example.videoplaylist.video.player.manager.VideoPlayManager;
 
 import java.util.ArrayList;
 
@@ -16,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
     private VideoListAdapter mAdapter;
+    private VideoPlayManager mVideoPlayManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,24 +36,26 @@ public class MainActivity extends AppCompatActivity {
         for (int i=0;i<10;i++){
             VideoInfo info = new VideoInfo();
             info.setDesc("des");
-            info.setVideoUrl("http://clips.vorwaerts-gmbh.de/VfE_html5.mp4");
+            //http://clips.vorwaerts-gmbh.de/VfE_html5.mp4
+            info.setVideoUrl("http://img.locker.cmcm.com/livelock/uservideo/90f1353176bc83dffe2f246eba496c7a");
             info.setThumbnailUrl("http://img2.imgtn.bdimg.com/it/u=11396313,1297606499&fm=21&gp=0.jpg");
             videoInfos.add(info);
         }
+        //
+        mVideoPlayManager = new DefaultVideoPlayManager();
+
         mAdapter = new VideoListAdapter(mRecyclerView);
         ((SimpleItemAnimator) mRecyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
         mRecyclerView.setAdapter(mAdapter);
         mAdapter.setData(videoInfos);
         mAdapter.setLinearLayout(linearLayoutManager);
-        mRecyclerView.addOnScrollListener(new PlayWindowScrollerListener(mAdapter));
+        mAdapter.setVideoPlayManager(mVideoPlayManager);
+        mRecyclerView.addOnScrollListener(new PlayWindowScrollerListener(mVideoPlayManager));
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (mAdapter != null) {
-            mAdapter.play();
-        }
     }
 
     @Override
