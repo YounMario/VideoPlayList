@@ -1,8 +1,6 @@
 package com.example.videoplaylist.video.adapter;
 
-import android.content.res.Resources;
 import android.graphics.SurfaceTexture;
-import android.graphics.drawable.Drawable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -16,7 +14,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.videoplaylist.App;
 import com.example.videoplaylist.R;
 import com.example.videoplaylist.utils.FileUtils;
 import com.example.videoplaylist.video.bean.VideoInfo;
@@ -212,7 +209,7 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
             @Override
             public void onClick(View v) {
                 if (currentWindow.getWindowIndex() == position) {
-                    currentWindow.updateUiToFocusState();
+                    mVideoPlayerManager.onFocus();
                 } else {
                     Log.i(TAG, "scroll to next");
                     onScrollTo(position, false);
@@ -367,9 +364,6 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
     }
 
 
-    private void onVideoChange() {
-
-    }
 
     private void playVideo(boolean needNotifyItemChanged) {
         if (currentPositionIsIllegal()) {

@@ -33,7 +33,8 @@ public class MainActivity extends AppCompatActivity {
         for (int i=0;i<10;i++){
             VideoInfo info = new VideoInfo();
             info.setDesc("des");
-            info.setVideoUrl("http://clips.vorwaerts-gmbh.de/VfE_html5.mp4");
+            //http://clips.vorwaerts-gmbh.de/VfE_html5.mp4
+            info.setVideoUrl("http://img.locker.cmcm.com/livelock/uservideo/90f1353176bc83dffe2f246eba496c7a");
             videoInfos.add(info);
         }
         mAdapter = new VideoListAdapter(mRecyclerView);

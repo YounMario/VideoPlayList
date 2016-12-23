@@ -37,15 +37,10 @@ public class ExoVideoPlayManager implements DemoPlayer.Listener {
     private boolean startPlay;
 
     private VideoPlayListener videoPlayListener;
-    private boolean needEncrypt;
+
 
     public ExoVideoPlayManager() {
-        this(true);
-    }
-
-    public ExoVideoPlayManager(boolean needEncrypt) {
         handler = new InnerHandler(this);
-        this.needEncrypt = needEncrypt;
     }
 
     public void setMute(boolean volumeMute) {
@@ -54,15 +49,16 @@ public class ExoVideoPlayManager implements DemoPlayer.Listener {
         }
     }
 
-    public void setNotifyListener(DemoPlayer.NotifyListener mNotifyListener) {
-        if (mExoPlayer != null) {
-            mExoPlayer.setNotifyListener(mNotifyListener);
-        }
-    }
 
     public int getTrackCount(int typeAudio) {
         if (mExoPlayer == null) return 0;
         return mExoPlayer.getTrackCount(typeAudio);
+    }
+
+    public void onFocus() {
+        if (currentWindow != null) {
+            currentWindow.updateUiToFocusState();
+        }
     }
 
 
@@ -70,7 +66,7 @@ public class ExoVideoPlayManager implements DemoPlayer.Listener {
         private WeakReference<ExoVideoPlayManager> mExoVideoPlayManagerRef;
 
         public InnerHandler(ExoVideoPlayManager playManager) {
-            mExoVideoPlayManagerRef = new WeakReference<ExoVideoPlayManager>(playManager);
+            mExoVideoPlayManagerRef = new WeakReference<>(playManager);
         }
 
 
@@ -101,7 +97,7 @@ public class ExoVideoPlayManager implements DemoPlayer.Listener {
         Log.i(TAG, "play videoPlayer");
         prePare(isMute);
         mExoPlayer.setPlayWhenReady(true);
-        mExoPlayer.seekTo( currentWindow.getCurrentSeek());
+        mExoPlayer.seekTo(currentWindow.getCurrentSeek());
         currentWindow.updateUiToPrepare();
         startPlay = true;
         if (currentWindow.getPlayerView() != null) {
@@ -300,7 +296,6 @@ public class ExoVideoPlayManager implements DemoPlayer.Listener {
     }
 
 
-
     public void onError(Exception e) {
         if (videoPlayListener != null) {
             videoPlayListener.onError(e);
@@ -312,7 +307,7 @@ public class ExoVideoPlayManager implements DemoPlayer.Listener {
         if (currentWindow == null) {
             return;
         }
-        TextureView textureView =  (TextureView) currentWindow.getVideoView();
+        TextureView textureView = (TextureView) currentWindow.getVideoView();
 
         if (textureView == null) return;
         int viewWidth = textureView.getWidth();
