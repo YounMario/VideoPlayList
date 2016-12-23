@@ -4,6 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 
 import com.example.videoplaylist.video.adapter.VideoListAdapter;
 import com.example.videoplaylist.video.bean.VideoInfo;
@@ -31,11 +32,12 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<VideoInfo> videoInfos = new ArrayList<>();
         for (int i=0;i<10;i++){
             VideoInfo info = new VideoInfo();
-            info.setTitle("dss");
-            info.setVideoUrl("http://img.locker.cmcm.com/livelock/uservideo/90f1353176bc83dffe2f246eba496c7a");
+            info.setDesc("des");
+            info.setVideoUrl("http://clips.vorwaerts-gmbh.de/VfE_html5.mp4");
             videoInfos.add(info);
         }
         mAdapter = new VideoListAdapter(mRecyclerView);
+        ((SimpleItemAnimator) mRecyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
         mRecyclerView.setAdapter(mAdapter);
         mAdapter.setData(videoInfos);
         mAdapter.setLinearLayout(linearLayoutManager);
@@ -46,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (mAdapter != null) {
-            mAdapter.onResume();
+            mAdapter.play();
         }
     }
 

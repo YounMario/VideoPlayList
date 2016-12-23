@@ -2,7 +2,6 @@ package com.example.videoplaylist.video.listener;
 
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 
 
 import com.example.videoplaylist.video.player.PlayableWindow;
@@ -70,15 +69,12 @@ public class PlayWindowScrollerListener extends RecyclerView.OnScrollListener {
         PlayableWindow needPlayWindow = findNeedPlay(lastPosition, recyclerView.getAdapter().getItemCount());
 
 
-        if (needPlayWindow != null && currentPlayableWindow != null && needPlayWindow.getWindowIndex() == currentPlayableWindow.getWindowIndex()) {
-            Log.i(TAG, "notify play current");
-            playManager.setPlayableWindow(needPlayWindow);
+        if (isWindowIndexNotChanged(needPlayWindow,currentPlayableWindow) && isPlayWindowInstanceNotChanged(needPlayWindow,currentPlayableWindow)) {
             playManager.resume();
             return;
         }
 
         if (currentPlayableWindow != null) {
-            Log.i(TAG, "notify stop current");
             playManager.stopPlay();
         }
 
@@ -118,4 +114,11 @@ public class PlayWindowScrollerListener extends RecyclerView.OnScrollListener {
         return lastPlayableWindow;
     }
 
+    private boolean isWindowIndexNotChanged(PlayableWindow needPlayWindow, PlayableWindow currentPlayableWindow) {
+        return needPlayWindow != null && currentPlayableWindow != null && needPlayWindow.getWindowIndex() == currentPlayableWindow.getWindowIndex();
+    }
+
+    private boolean isPlayWindowInstanceNotChanged(PlayableWindow window1, PlayableWindow window2) {
+        return window1 == window2;
+    }
 }

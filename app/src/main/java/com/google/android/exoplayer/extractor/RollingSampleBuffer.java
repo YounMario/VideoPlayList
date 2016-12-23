@@ -258,7 +258,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 
     // Populate the cryptoInfo.
     sampleHolder.cryptoInfo.set(subsampleCount, clearDataSizes, encryptedDataSizes,
-        extrasHolder.encryptionKeyId, sampleHolder.cryptoInfo.iv, C.CRYPTO_MODE_AES_CTR);
+            extrasHolder.encryptionKeyId, sampleHolder.cryptoInfo.iv, C.CRYPTO_MODE_AES_CTR);
 
     // Adjust the offset and size to take into account the bytes read.
     int bytesRead = (int) (offset - extrasHolder.offset);
@@ -302,7 +302,7 @@ import java.util.concurrent.LinkedBlockingDeque;
       int toCopy = Math.min(length - bytesRead, allocationLength - positionInAllocation);
       Allocation allocation = dataQueue.peek();
       System.arraycopy(allocation.data, allocation.translateOffset(positionInAllocation), target,
-          bytesRead, toCopy);
+              bytesRead, toCopy);
       absolutePosition += toCopy;
       bytesRead += toCopy;
     }
@@ -355,10 +355,10 @@ import java.util.concurrent.LinkedBlockingDeque;
    * @throws IOException If an error occurs reading from the source.
    */
   public int appendData(DataSource dataSource, int length, boolean allowEndOfInput)
-      throws IOException {
+          throws IOException {
     length = prepareForAppend(length);
     int bytesAppended = dataSource.read(lastAllocation.data,
-        lastAllocation.translateOffset(lastAllocationOffset), length);
+            lastAllocation.translateOffset(lastAllocationOffset), length);
     if (bytesAppended == C.RESULT_END_OF_INPUT) {
       if (allowEndOfInput) {
         return C.RESULT_END_OF_INPUT;
@@ -383,10 +383,10 @@ import java.util.concurrent.LinkedBlockingDeque;
    * @throws InterruptedException If the thread has been interrupted.
    */
   public int appendData(ExtractorInput input, int length, boolean allowEndOfInput)
-      throws IOException, InterruptedException {
+          throws IOException, InterruptedException {
     length = prepareForAppend(length);
     int bytesAppended = input.read(lastAllocation.data,
-        lastAllocation.translateOffset(lastAllocationOffset), length);
+            lastAllocation.translateOffset(lastAllocationOffset), length);
     if (bytesAppended == C.RESULT_END_OF_INPUT) {
       if (allowEndOfInput) {
         return C.RESULT_END_OF_INPUT;
@@ -408,7 +408,7 @@ import java.util.concurrent.LinkedBlockingDeque;
     while (length > 0) {
       int thisAppendLength = prepareForAppend(length);
       buffer.readBytes(lastAllocation.data, lastAllocation.translateOffset(lastAllocationOffset),
-          thisAppendLength);
+              thisAppendLength);
       lastAllocationOffset += thisAppendLength;
       totalBytesWritten += thisAppendLength;
       length -= thisAppendLength;
@@ -425,7 +425,7 @@ import java.util.concurrent.LinkedBlockingDeque;
    * @param encryptionKey The encryption key associated with the sample, or null.
    */
   public void commitSample(long sampleTimeUs, int flags, long position, int size,
-      byte[] encryptionKey) {
+                           byte[] encryptionKey) {
     infoQueue.commitSample(sampleTimeUs, flags, position, size, encryptionKey);
   }
 
@@ -562,7 +562,7 @@ import java.util.concurrent.LinkedBlockingDeque;
         relativeReadIndex = 0;
       }
       return queueSize > 0 ? offsets[relativeReadIndex]
-          : (sizes[lastReadIndex] + offsets[lastReadIndex]);
+              : (sizes[lastReadIndex] + offsets[lastReadIndex]);
     }
 
     /**
@@ -612,52 +612,55 @@ import java.util.concurrent.LinkedBlockingDeque;
     // Called by the loading thread.
 
     public synchronized void commitSample(long timeUs, int sampleFlags, long offset, int size,
-        byte[] encryptionKey) {
-      timesUs[relativeWriteIndex] = timeUs;
-      offsets[relativeWriteIndex] = offset;
-      sizes[relativeWriteIndex] = size;
-      flags[relativeWriteIndex] = sampleFlags;
-      encryptionKeys[relativeWriteIndex] = encryptionKey;
-      // Increment the write index.
-      queueSize++;
-      if (queueSize == capacity) {
-        // Increase the capacity.
-        int newCapacity = capacity + SAMPLE_CAPACITY_INCREMENT;
-        long[] newOffsets = new long[newCapacity];
-        long[] newTimesUs = new long[newCapacity];
-        int[] newFlags = new int[newCapacity];
-        int[] newSizes = new int[newCapacity];
-        byte[][] newEncryptionKeys = new byte[newCapacity][];
-        int beforeWrap = capacity - relativeReadIndex;
-        System.arraycopy(offsets, relativeReadIndex, newOffsets, 0, beforeWrap);
-        System.arraycopy(timesUs, relativeReadIndex, newTimesUs, 0, beforeWrap);
-        System.arraycopy(flags, relativeReadIndex, newFlags, 0, beforeWrap);
-        System.arraycopy(sizes, relativeReadIndex, newSizes, 0, beforeWrap);
-        System.arraycopy(encryptionKeys, relativeReadIndex, newEncryptionKeys, 0, beforeWrap);
-        int afterWrap = relativeReadIndex;
-        System.arraycopy(offsets, 0, newOffsets, beforeWrap, afterWrap);
-        System.arraycopy(timesUs, 0, newTimesUs, beforeWrap, afterWrap);
-        System.arraycopy(flags, 0, newFlags, beforeWrap, afterWrap);
-        System.arraycopy(sizes, 0, newSizes, beforeWrap, afterWrap);
-        System.arraycopy(encryptionKeys, 0, newEncryptionKeys, beforeWrap, afterWrap);
-        offsets = newOffsets;
-        timesUs = newTimesUs;
-        flags = newFlags;
-        sizes = newSizes;
-        encryptionKeys = newEncryptionKeys;
-        relativeReadIndex = 0;
-        relativeWriteIndex = capacity;
-        queueSize = capacity;
-        capacity = newCapacity;
-      } else {
-        relativeWriteIndex++;
-        if (relativeWriteIndex == capacity) {
-          // Wrap around.
-          relativeWriteIndex = 0;
+                                          byte[] encryptionKey) {
+      try {
+        timesUs[relativeWriteIndex] = timeUs;
+        offsets[relativeWriteIndex] = offset;
+        sizes[relativeWriteIndex] = size;
+        flags[relativeWriteIndex] = sampleFlags;
+        encryptionKeys[relativeWriteIndex] = encryptionKey;
+        // Increment the write index.
+        queueSize++;
+        if (queueSize == capacity) {
+          // Increase the capacity.
+          int newCapacity = capacity + SAMPLE_CAPACITY_INCREMENT;
+          long[] newOffsets = new long[newCapacity];
+          long[] newTimesUs = new long[newCapacity];
+          int[] newFlags = new int[newCapacity];
+          int[] newSizes = new int[newCapacity];
+          byte[][] newEncryptionKeys = new byte[newCapacity][];
+          int beforeWrap = capacity - relativeReadIndex;
+          System.arraycopy(offsets, relativeReadIndex, newOffsets, 0, beforeWrap);
+          System.arraycopy(timesUs, relativeReadIndex, newTimesUs, 0, beforeWrap);
+          System.arraycopy(flags, relativeReadIndex, newFlags, 0, beforeWrap);
+          System.arraycopy(sizes, relativeReadIndex, newSizes, 0, beforeWrap);
+          System.arraycopy(encryptionKeys, relativeReadIndex, newEncryptionKeys, 0, beforeWrap);
+          int afterWrap = relativeReadIndex;
+          System.arraycopy(offsets, 0, newOffsets, beforeWrap, afterWrap);
+          System.arraycopy(timesUs, 0, newTimesUs, beforeWrap, afterWrap);
+          System.arraycopy(flags, 0, newFlags, beforeWrap, afterWrap);
+          System.arraycopy(sizes, 0, newSizes, beforeWrap, afterWrap);
+          System.arraycopy(encryptionKeys, 0, newEncryptionKeys, beforeWrap, afterWrap);
+          offsets = newOffsets;
+          timesUs = newTimesUs;
+          flags = newFlags;
+          sizes = newSizes;
+          encryptionKeys = newEncryptionKeys;
+          relativeReadIndex = 0;
+          relativeWriteIndex = capacity;
+          queueSize = capacity;
+          capacity = newCapacity;
+        } else {
+          relativeWriteIndex++;
+          if (relativeWriteIndex == capacity) {
+            // Wrap around.
+            relativeWriteIndex = 0;
+          }
         }
+      } catch (OutOfMemoryError e) {
+        clear();
       }
     }
-
   }
 
   /**

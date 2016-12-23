@@ -279,7 +279,6 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
                         mSurface = null;
                     }
                     Log.i("locker_news_videoplay", "on pause.......");
-                    onVideoChange();
                     pause();
                 }
                 return true;
@@ -414,7 +413,6 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
 
     private void setExpired() {
         //视频播放时，就将视频置为已看过
-        int currentPlayingPosition = currentWindow.getWindowIndex();
     }
 
     private void stopPlayer() {
