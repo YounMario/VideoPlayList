@@ -37,15 +37,12 @@ import java.util.List;
 public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayManager {
 
 
-
     private static final String TAG = "VideoListAdapter";
     private static final String TAG_TEXTURE = "texture";
 
     private static final String TAG_ITEM_STATE = "video_item_state";
     private static final String TAG_SAVE_CURRENT = "save_current_seek";
-    private final Drawable mPauseIconDrawable;
-    private final Drawable mPlayIconDrawable;
-    private ItemState currentState;
+    private int currentState;
 
     private ExoVideoPlayManager mVideoPlayerManager;
     private PlayableWindow currentWindow;
@@ -60,10 +57,15 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
     private long mFirstItemDefaultSeek;
     private LinearLayoutManager mLinearLayoutManager;
 
+    private static final int STATE_INIT = -1;
+    private static final int STATE_INITED = 0;
+    private static final int STATE_NORMAL = 1;
+    private static final int STATE_PLAY = 2;
+    private static final int STATE_PAUSE = 3;
 
 
     public void onResume() {
-        if (checkStateEquals(currentState, ItemState.PAUSE) || checkStateEquals(currentState, ItemState.INITED)) {
+        if (currentState == STATE_PAUSE || currentState == STATE_INITED) {
             Log.i(TAG_ITEM_STATE, "on onResumePlay : " + this);
             playVideo(true);
         }
@@ -84,7 +86,7 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
         }
     }
 
-    private boolean positionIsIllegal(int position){
+    private boolean positionIsIllegal(int position) {
         return position < 0 || position >= getItemCount();
     }
 
@@ -101,9 +103,6 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
         }
     }
 
-    private static boolean checkStateEquals(ItemState one, ItemState other) {
-        return !(one == null || other == null) && one.equals(other);
-    }
 
     public void setData(List<VideoInfo> videos) {
         data = videos;
@@ -115,7 +114,6 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
     }
 
 
-
     public void setFirstItemDuring(long mVideoDuring) {
 
     }
@@ -125,14 +123,10 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
     }
 
 
-    private enum ItemState {
-        NOMAL, PLAY, PAUSE, INIT, INITED;
-    }
-
     public VideoListAdapter(RecyclerView recyclerView) {
         mRecycleView = recyclerView;
         mVideoPlayerManager = new ExoVideoPlayManager();
-        currentState = ItemState.INIT;
+        currentState = STATE_INIT;
 
         data = new ArrayList<>();
         mVideoPlayerManager.setPlayListener(new VideoPlayListener() {
@@ -169,10 +163,7 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
 
         //Log.i("locker_news_videoplay", "onCreate ：mStartTime 被置为了  = " + mStartTime );
         Resources resources = App.getInstance().getResources();
-        mPauseIconDrawable = resources.getDrawable(R.drawable.icon_pause);
-        mPlayIconDrawable = resources.getDrawable(R.drawable.icon_play);
     }
-
 
 
     private boolean currentPositionIsIllegal() {
@@ -202,12 +193,12 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
         VideoInfo videoInfo = getItem(position);
         final VideoItemHolder window = (VideoItemHolder) holder;
 
-        if (checkStateEquals(currentState, ItemState.INIT)) {
+        if (currentState == STATE_INIT) {
             currentWindow = window;
             currentWindow.setWindowIndex(position);
             currentWindow.setCurrentSeek(mFirstItemDefaultSeek);
             playSeekMap.put(position, mFirstItemDefaultSeek);
-            setCurrentState(ItemState.INITED);
+            setCurrentState(STATE_INITED);
         }
 
         final ImageView playBtn = (ImageView) window.getVideoPlayBtn();
@@ -215,16 +206,16 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
             @Override
             public void onClick(View v) {
                 if (currentWindow.getWindowIndex() == position) {
-                    if (checkStateEquals(currentState, ItemState.PLAY)) {
+                    if (currentState == STATE_PLAY) {
                         window.updateUiToPauseState();
-                        setCurrentState(ItemState.PAUSE);
+                        setCurrentState(STATE_PAUSE);
                         mVideoPlayerManager.pause();
-                        playBtn.setImageDrawable(mPlayIconDrawable);
-                    } else if (checkStateEquals(currentState, ItemState.PAUSE)) {
-                        setCurrentState(ItemState.PLAY);
+                        playBtn.setImageResource(R.drawable.icon_play);
+                    } else if (currentState == STATE_PAUSE) {
+                        setCurrentState(STATE_PLAY);
                         window.updateUiToPlayState();
                         mVideoPlayerManager.resume();
-                        playBtn.setImageDrawable(mPauseIconDrawable);
+                        playBtn.setImageResource(R.drawable.icon_pause);
                     }
                 }
             }
@@ -256,7 +247,7 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
                     mSurface = new Surface(surface);
 
                     mVideoPlayerManager.setSurface(mSurface);
-                    if (!checkStateEquals(currentState, ItemState.PLAY)) {
+                    if (currentState != STATE_PLAY) {
                         Log.i(TAG_ITEM_STATE, "first show and play  position:" + position + " object:" + VideoListAdapter.this);
                         playVideo(false);
                     }
@@ -267,9 +258,10 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
             public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
 
             }
+
             @Override
             public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-                if(surface != null){
+                if (surface != null) {
                     surface.release();
                 }
                 if (currentWindow != null && position == currentWindow.getWindowIndex()) {
@@ -295,7 +287,9 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
         String desc = videoInfo.getDesc();
         descText.setText(desc);
 
-        if (window.getWindowIndex() != position) {
+
+        if (currentWindow != null && currentWindow.getWindowIndex() != position) {
+            playBtn.setImageResource(R.drawable.icon_pause);
             window.updateUiToNormalState();
         }
 
@@ -306,7 +300,7 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
         return data.size();
     }
 
-    public VideoInfo getItem(int position){
+    public VideoInfo getItem(int position) {
         return data.get(position);
     }
 
@@ -317,7 +311,7 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
     }
 
     private String getPlayAblePath() {
-        if(currentWindow == null){
+        if (currentWindow == null) {
             return null;
         }
         final VideoInfo itemVideoInfo = getItem(currentWindow.getWindowIndex());
@@ -328,25 +322,25 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
             localPath = FileUtils.convertUrlToLocalPath(webPath);
         }
         File f = new File(localPath);
-        if(f.exists()){
+        if (f.exists()) {
             return localPath;
-        }else{
-            if(TextUtils.isEmpty(webPath)){
+        } else {
+            if (TextUtils.isEmpty(webPath)) {
                 throw new RuntimeException("error url");
             }
             return webPath;
         }
     }
 
-    private void setCurrentState(ItemState currentState) {
-        Log.i("aStateChanged", " currentState:" + currentState.toString());
+    private void setCurrentState(int currentState) {
+        Log.i("aStateChanged", " currentState:" + currentState);
         this.currentState = currentState;
     }
 
 
     @Override
     public void stopPlay() {
-        if (currentWindow == null){
+        if (currentWindow == null) {
             return;
         }
         saveCurrentPlayTime(currentWindow);
@@ -357,8 +351,8 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
 
     @Override
     public void pause() {
-        if (mVideoPlayerManager != null && currentState == ItemState.PLAY) {
-            setCurrentState(ItemState.PAUSE);
+        if (mVideoPlayerManager != null && currentState == STATE_PLAY) {
+            setCurrentState(STATE_PAUSE);
             saveCurrentPlayTime(currentWindow);
             mVideoPlayerManager.stopPlay();
         }
@@ -376,7 +370,7 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
 
     @Override
     public void resume() {
-        if (checkStateEquals(currentState, ItemState.NOMAL) || checkStateEquals(currentState, ItemState.PAUSE)) {
+        if (currentState == STATE_NORMAL || currentState == STATE_PAUSE) {
             play();
         }
     }
@@ -400,7 +394,7 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
         if (url == null) {
             return;
         }
-        setCurrentState(ItemState.PLAY);
+        setCurrentState(STATE_PLAY);
 
         if (needNotifyItemChanged) {
             notifyItemChanged(currentPlayingPosition);
@@ -417,7 +411,7 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
 
     private void stopPlayer() {
         if (mVideoPlayerManager != null) {
-            setCurrentState(ItemState.NOMAL);
+            setCurrentState(STATE_NORMAL);
             mVideoPlayerManager.stopPlay();
         }
     }
