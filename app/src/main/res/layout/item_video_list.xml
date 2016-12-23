@@ -22,8 +22,8 @@
             android:id="@+id/btn_pause"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_centerInParent="true"
-            android:visibility="gone" />
+            app:srcCompat="@drawable/icon_pause"
+            android:layout_centerInParent="true" />
 
         <com.example.videoplaylist.video.widget.VideoPlayerBottomBar
             android:id="@+id/video_play_bottom_bar"
