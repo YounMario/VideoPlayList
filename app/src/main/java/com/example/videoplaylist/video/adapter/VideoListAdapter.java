@@ -109,14 +109,6 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
         notifyDataSetChanged();
     }
 
-    public void setFirstItemSeek(long firstItemSeek) {
-        mFirstItemDefaultSeek = firstItemSeek;
-    }
-
-
-    public void setFirstItemDuring(long mVideoDuring) {
-
-    }
 
     public void setLinearLayout(LinearLayoutManager linearLayoutManager) {
         this.mLinearLayoutManager = linearLayoutManager;
@@ -160,9 +152,6 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
         });
 
         playSeekMap = new SparseArray<>();
-
-        //Log.i("locker_news_videoplay", "onCreate ：mStartTime 被置为了  = " + mStartTime );
-        Resources resources = App.getInstance().getResources();
     }
 
 
@@ -207,13 +196,11 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
             public void onClick(View v) {
                 if (currentWindow.getWindowIndex() == position) {
                     if (currentState == STATE_PLAY) {
-                        window.updateUiToPauseState();
                         setCurrentState(STATE_PAUSE);
                         mVideoPlayerManager.pause();
                         playBtn.setImageResource(R.drawable.icon_play);
                     } else if (currentState == STATE_PAUSE) {
                         setCurrentState(STATE_PLAY);
-                        window.updateUiToPlayState();
                         mVideoPlayerManager.resume();
                         playBtn.setImageResource(R.drawable.icon_pause);
                     }

@@ -162,7 +162,7 @@ public class ExoVideoPlayManager implements DemoPlayer.Listener {
             mExoPlayer.setPlayWhenReady(true);
         }
         if (currentWindow != null) {
-            currentWindow.updateUiToResumeState();
+            currentWindow.updateUiToPlayState();
         }
     }
 
