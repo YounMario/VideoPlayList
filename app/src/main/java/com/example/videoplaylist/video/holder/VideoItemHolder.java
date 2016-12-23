@@ -10,6 +10,7 @@ import android.widget.ImageView;
 
 import com.example.videoplaylist.R;
 import com.example.videoplaylist.video.anim.AnimationUtils;
+import com.example.videoplaylist.video.player.ExoVideoPlayManager;
 import com.example.videoplaylist.video.player.PlayableWindow;
 import com.example.videoplaylist.video.utils.ThreadUtils;
 import com.example.videoplaylist.video.utils.ViewUitls;
@@ -21,6 +22,8 @@ import com.example.videoplaylist.video.widget.VideoPlayerBottomBar;
  */
 
 public class VideoItemHolder extends RecyclerView.ViewHolder implements PlayableWindow {
+
+    private static final String TAG = "VideoItemHolder";
 
     private View mItemView;
     private TextureView textureView;
@@ -43,6 +46,7 @@ public class VideoItemHolder extends RecyclerView.ViewHolder implements Playable
     private ObjectAnimator playButtonAnimation;
     private Runnable mDelayHideRunnable;
 
+    private ExoVideoPlayManager mVideoPlayerManager;
 
     public VideoItemHolder(View itemView) {
         super(itemView);
@@ -57,6 +61,8 @@ public class VideoItemHolder extends RecyclerView.ViewHolder implements Playable
         videoPlayerBottomBar = (VideoPlayerBottomBar) itemView.findViewById(R.id.video_play_bottom_bar);
         frameCover = (FrameLayout) itemView.findViewById(R.id.frame_cover);
         ivLoading = (ImageView) itemView.findViewById(R.id.img_buffering);
+        mVideoPlayerManager = new ExoVideoPlayManager();
+        mVideoPlayerManager.setPlayableWindow(this);
     }
 
     public View getView(int resId) {
@@ -219,7 +225,7 @@ public class VideoItemHolder extends RecyclerView.ViewHolder implements Playable
 
     @Override
     public long getCurrentSeek() {
-        return mCurrentPlaySeek;
+        return mVideoPlayerManager.getCurrentSeek();
     }
 
 
@@ -239,6 +245,53 @@ public class VideoItemHolder extends RecyclerView.ViewHolder implements Playable
         stopRoationAnimation();
         stopBottomBarAnimation();
         stopPlayButtonAnimation();
+        releasePlayer();
+    }
+
+    private void releasePlayer() {
+        if (mVideoPlayerManager != null) {
+            mVideoPlayerManager.release();
+        }
+    }
+
+    @Override
+    public void stopPlay() {
+        mVideoPlayerManager.stopPlay();
+    }
+
+    @Override
+    public boolean isPlaying() {
+        return mVideoPlayerManager.isPlaying();
+    }
+
+    @Override
+    public void setUrl(String url) {
+        mVideoPlayerManager.setUrl(url);
+    }
+
+    @Override
+    public void play() {
+        mVideoPlayerManager.play();
+    }
+
+    @Override
+    public void pause() {
+        mVideoPlayerManager.pause();
+    }
+
+    @Override
+    public void resume() {
+        mVideoPlayerManager.resume();
+    }
+
+    @Override
+    public void onFocus() {
+        mVideoPlayerManager.onFocus();
+    }
+
+    @Override
+    public void setSurface(Surface mSurface) {
+        mVideoPlayerManager.setSurface(mSurface);
     }
 
     private void stopPlayButtonAnimation() {

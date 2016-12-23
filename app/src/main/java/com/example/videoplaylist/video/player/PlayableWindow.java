@@ -55,5 +55,20 @@ public interface PlayableWindow {
 
     void onRelease();
 
+    //----new --------
+    void stopPlay();
 
+    boolean isPlaying();
+
+    void setUrl(String url);
+
+    void play();
+
+    void pause();
+
+    void resume();
+
+    void onFocus();
+
+    void setSurface(Surface mSurface);
 }

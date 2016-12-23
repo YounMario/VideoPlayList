@@ -19,8 +19,6 @@ import com.example.videoplaylist.R;
 import com.example.videoplaylist.utils.FileUtils;
 import com.example.videoplaylist.video.bean.VideoInfo;
 import com.example.videoplaylist.video.holder.VideoItemHolder;
-import com.example.videoplaylist.video.listener.VideoPlayListener;
-import com.example.videoplaylist.video.player.ExoVideoPlayManager;
 import com.example.videoplaylist.video.player.PlayableWindow;
 import com.example.videoplaylist.video.player.VideoPlayManager;
 import com.squareup.picasso.Picasso;
@@ -43,7 +41,6 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
     private static final String TAG_SAVE_CURRENT = "save_current_seek";
     private int currentState;
 
-    private ExoVideoPlayManager mVideoPlayerManager;
     private PlayableWindow currentWindow;
     private RecyclerView mRecycleView;
 
@@ -91,14 +88,11 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
 
 
     public void release() {
-        if (mVideoPlayerManager != null) {
-            Log.i(TAG_ITEM_STATE, "release player:" + this);
-            stopPlay();
-            if (currentWindow != null) {
-                currentWindow.onRelease();
-                currentWindow = null;
-            }
-            mVideoPlayerManager.release();
+        Log.i(TAG_ITEM_STATE, "release player:" + this);
+        stopPlay();
+        if (currentWindow != null) {
+            currentWindow.onRelease();
+            currentWindow = null;
         }
     }
 
@@ -116,39 +110,38 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
 
     public VideoListAdapter(RecyclerView recyclerView) {
         mRecycleView = recyclerView;
-        mVideoPlayerManager = new ExoVideoPlayManager();
         currentState = STATE_INIT;
 
         data = new ArrayList<>();
-        mVideoPlayerManager.setPlayListener(new VideoPlayListener() {
-            @Override
-            public void playFinished(boolean playWhenReady) {
-                if (currentPositionIsIllegal()) {
-                    return;
-                }
-                onScrollTo(currentWindow.getWindowIndex() + 1, true);
-                if (lastPlayVideoUrlChanged()) {
-                    playVideo(false);
-                } else {
-                    mVideoPlayerManager.seekTo(0);
-                }
-                setExpired();
-            }
-
-            @Override
-            public void playStarted() {
-            }
-
-            @Override
-            public void playerReady(boolean playWhenReady) {
-
-            }
-
-            @Override
-            public void onError(Exception ex) {
-
-            }
-        });
+//        mVideoPlayerManager.setPlayListener(new VideoPlayListener() {
+//            @Override
+//            public void playFinished(boolean playWhenReady) {
+//                if (currentPositionIsIllegal()) {
+//                    return;
+//                }
+//                onScrollTo(currentWindow.getWindowIndex() + 1, true);
+//                if (lastPlayVideoUrlChanged()) {
+//                    playVideo(false);
+//                } else {
+//                    mVideoPlayerManager.seekTo(0);
+//                }
+//                setExpired();
+//            }
+//
+//            @Override
+//            public void playStarted() {
+//            }
+//
+//            @Override
+//            public void playerReady(boolean playWhenReady) {
+//
+//            }
+//
+//            @Override
+//            public void onError(Exception ex) {
+//
+//            }
+//        });
 
         playSeekMap = new SparseArray<>();
     }
@@ -158,17 +151,17 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
         return currentWindow == null || positionIsIllegal(currentWindow.getWindowIndex());
     }
 
-    private boolean lastPlayVideoUrlChanged() {
-        String currentPlayUrl = getPlayAblePath();
-        if (currentPlayUrl == null) {
-            return false;
-        }
-
-        if (!currentPlayUrl.equals(mVideoPlayerManager.getCurrentUrl())) {
-            return true;
-        }
-        return false;
-    }
+//    private boolean lastPlayVideoUrlChanged() {
+//        String currentPlayUrl = getPlayAblePath();
+//        if (currentPlayUrl == null) {
+//            return false;
+//        }
+//
+//        if (!currentPlayUrl.equals(mVideoPlayerManager.getCurrentUrl())) {
+//            return true;
+//        }
+//        return false;
+//    }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -196,11 +189,11 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
                 if (currentWindow.getWindowIndex() == position) {
                     if (currentState == STATE_PLAY) {
                         setCurrentState(STATE_PAUSE);
-                        mVideoPlayerManager.pause();
+                        currentWindow.pause();
                         playBtn.setImageResource(R.drawable.icon_play);
                     } else if (currentState == STATE_PAUSE) {
                         setCurrentState(STATE_PLAY);
-                        mVideoPlayerManager.resume();
+                        currentWindow.resume();
                         playBtn.setImageResource(R.drawable.icon_pause);
                     }
                 }
@@ -211,7 +204,7 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
             @Override
             public void onClick(View v) {
                 if (currentWindow.getWindowIndex() == position) {
-                    mVideoPlayerManager.onFocus();
+                    currentWindow.onFocus();
                 } else {
                     Log.i(TAG, "scroll to next");
                     onScrollTo(position, false);
@@ -235,8 +228,7 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
                         mSurface.release();
                     }
                     mSurface = new Surface(surface);
-
-                    mVideoPlayerManager.setSurface(mSurface);
+                    currentWindow.setSurface(mSurface);
                     if (currentState != STATE_PLAY) {
                         Log.i(TAG_ITEM_STATE, "first show and play  position:" + position + " object:" + VideoListAdapter.this);
                         playVideo(false);
@@ -341,10 +333,10 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
 
     @Override
     public void pause() {
-        if (mVideoPlayerManager != null && currentState == STATE_PLAY) {
+        if (currentWindow != null && currentState == STATE_PLAY) {
             setCurrentState(STATE_PAUSE);
             saveCurrentPlayTime(currentWindow);
-            mVideoPlayerManager.stopPlay();
+            currentWindow.stopPlay();
         }
     }
 
@@ -387,9 +379,8 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
             notifyItemChanged(currentPlayingPosition);
         }
         applyCurrentPlayTime(currentWindow);
-        mVideoPlayerManager.setPlayableWindow(currentWindow);
-        mVideoPlayerManager.setUrl(url);
-        mVideoPlayerManager.play();
+        currentWindow.setUrl(url);
+        currentWindow.play();
     }
 
     private void setExpired() {
@@ -397,15 +388,15 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
     }
 
     private void stopPlayer() {
-        if (mVideoPlayerManager != null) {
+        if(currentWindow != null){
             setCurrentState(STATE_NORMAL);
-            mVideoPlayerManager.stopPlay();
+            currentWindow.stopPlay();
         }
     }
 
     private void saveCurrentPlayTime(PlayableWindow currentPlayingWindow) {
-        if (currentPlayingWindow != null && mVideoPlayerManager.isPlaying()) {
-            long currentSeek = mVideoPlayerManager.getCurrentSeek();
+        if (currentPlayingWindow != null && currentPlayingWindow.isPlaying()) {
+            long currentSeek = currentPlayingWindow.getCurrentSeek();
             Log.i(TAG_SAVE_CURRENT, " save current play time position :" + currentPlayingWindow.getWindowIndex() + "  current seek:" + currentSeek);
             playSeekMap.put(currentPlayingWindow.getWindowIndex(), currentSeek);
         }
