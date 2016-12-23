@@ -327,7 +327,10 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
         }
         saveCurrentPlayTime(currentWindow);
         Log.i(TAG, "stop play position:" + currentWindow.getWindowIndex());
-        stopPlayer();
+        setCurrentState(STATE_NORMAL);
+        if (currentWindow != null) {
+            currentWindow.stopPlay();
+        }
         notifyItemChanged(currentWindow.getWindowIndex());
     }
 
@@ -387,12 +390,6 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
         //视频播放时，就将视频置为已看过
     }
 
-    private void stopPlayer() {
-        if(currentWindow != null){
-            setCurrentState(STATE_NORMAL);
-            currentWindow.stopPlay();
-        }
-    }
 
     private void saveCurrentPlayTime(PlayableWindow currentPlayingWindow) {
         if (currentPlayingWindow != null && currentPlayingWindow.isPlaying()) {
