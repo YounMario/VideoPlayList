@@ -50,7 +50,6 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
     private List<VideoInfo> data;
     private SparseArray<Long> playSeekMap;
 
-    private long mFirstItemDefaultSeek;
     private LinearLayoutManager mLinearLayoutManager;
 
     private static final int STATE_INIT = -1;
@@ -110,7 +109,7 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
 
     public VideoListAdapter(RecyclerView recyclerView) {
         mRecycleView = recyclerView;
-        currentState = STATE_INIT;
+        setCurrentState(STATE_INIT);
 
         data = new ArrayList<>();
 //        mVideoPlayerManager.setPlayListener(new VideoPlayListener() {
@@ -177,8 +176,7 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
         if (currentState == STATE_INIT) {
             currentWindow = window;
             currentWindow.setWindowIndex(position);
-            currentWindow.setCurrentSeek(mFirstItemDefaultSeek);
-            playSeekMap.put(position, mFirstItemDefaultSeek);
+            playSeekMap.put(position, 0L);
             setCurrentState(STATE_INITED);
         }
 
@@ -253,7 +251,11 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
                         mSurface = null;
                     }
                     Log.i("locker_news_videoplay", "on pause.......");
-                    pause();
+                    if (currentWindow != null && currentState == STATE_PLAY) {
+                        currentState = STATE_PAUSE;
+                        saveCurrentPlayTime(currentWindow);
+                        currentWindow.stopPlay();
+                    }
                 }
                 return true;
             }
@@ -336,12 +338,9 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
 
     @Override
     public void pause() {
-        if (currentWindow != null && currentState == STATE_PLAY) {
-            setCurrentState(STATE_PAUSE);
-            saveCurrentPlayTime(currentWindow);
-            currentWindow.stopPlay();
-        }
+
     }
+
 
     @Override
     public void setPlayableWindow(PlayableWindow window) {
@@ -384,10 +383,6 @@ public class VideoListAdapter extends RecyclerView.Adapter implements VideoPlayM
         applyCurrentPlayTime(currentWindow);
         currentWindow.setUrl(url);
         currentWindow.play();
-    }
-
-    private void setExpired() {
-        //视频播放时，就将视频置为已看过
     }
 
 
