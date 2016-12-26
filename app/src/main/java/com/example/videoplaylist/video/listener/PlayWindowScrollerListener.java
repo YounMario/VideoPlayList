@@ -94,7 +94,7 @@ public class PlayWindowScrollerListener extends RecyclerView.OnScrollListener {
         PlayableWindow lastPlayableWindow = mPlayableWindows.get(lastIndex);
 
         //if lastPosition is not the last of recycleView item
-        if (lastPosition != recycleViewItemCount - 1 || lastPlayableWindow.getWindowIndex() < lastPosition) {
+        if (lastIndex == 0 || lastPosition != recycleViewItemCount - 1 || lastPlayableWindow.getWindowIndex() < lastPosition) {
             return mPlayableWindows.get(0);
         }
 
@@ -104,7 +104,6 @@ public class PlayWindowScrollerListener extends RecyclerView.OnScrollListener {
 
         //if secondLastPlayableWindow's area larger than LastPlayableWindow return secondLastPlayableWindow
         if (secondLastPlayableWindow != null) {
-            //indexListSize is at less 2 here
             if (lastPlayableWindow.getWindowLastCalculateArea() < secondLastPlayableWindow.getWindowLastCalculateArea()) {
                 return secondLastPlayableWindow;
             }

@@ -9,7 +9,7 @@
     <RelativeLayout
         android:id="@+id/play_view_container"
         android:layout_width="match_parent"
-        android:layout_height="202dp">
+        android:layout_height="400dp">
 
 
         <com.example.videoplaylist.video.widget.CustomTextureView
@@ -99,7 +99,7 @@
     <FrameLayout
         android:id="@+id/frame_cover"
         android:layout_width="match_parent"
-        android:layout_height="259dp"
+        android:layout_height="457dp"
         android:background="#CC000000"
         android:visibility="visible" />
 </RelativeLayout>
