@@ -15,8 +15,6 @@ public interface VideoPlayManager {
 
     void pause();
 
-    void setPlayableWindow(PlayableWindow window);
-
     PlayableWindow getCurrentPlayableWindow();
 
     void resume();
@@ -24,4 +22,8 @@ public interface VideoPlayManager {
     void onScrollFinished(boolean isUp);
 
     void release();
+
+    void onAttach(PlayableWindow needPlayWindow);
+
+    void onDetach(PlayableWindow currentPlayableWindow);
 }

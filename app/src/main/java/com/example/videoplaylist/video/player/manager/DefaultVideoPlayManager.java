@@ -62,20 +62,13 @@ public class DefaultVideoPlayManager implements VideoPlayManager {
     }
 
     @Override
-    public void setPlayableWindow(PlayableWindow window) {
-        this.mCurrentWindow = window;
-    }
-
-    @Override
     public PlayableWindow getCurrentPlayableWindow() {
         return mCurrentWindow;
     }
 
     @Override
     public void resume() {
-        if (mCurrentState == STATE_NORMAL || mCurrentState == STATE_PAUSE) {
-            play();
-        }
+
     }
 
     @Override
@@ -90,6 +83,19 @@ public class DefaultVideoPlayManager implements VideoPlayManager {
             mCurrentWindow.onRelease();
             mCurrentWindow = null;
         }
+    }
+
+    @Override
+    public void onAttach(PlayableWindow needPlayWindow) {
+        mCurrentWindow = needPlayWindow;
+        if (mCurrentState == STATE_NORMAL || mCurrentState == STATE_PAUSE) {
+            play();
+        }
+    }
+
+    @Override
+    public void onDetach(PlayableWindow currentPlayableWindow) {
+        stopPlay();
     }
 
     private String getPlayAblePath() {

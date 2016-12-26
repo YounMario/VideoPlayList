@@ -69,20 +69,19 @@ public class PlayWindowScrollerListener extends RecyclerView.OnScrollListener {
         PlayableWindow needPlayWindow = findNeedPlay(lastPosition, recyclerView.getAdapter().getItemCount());
 
 
-        if (isWindowIndexNotChanged(needPlayWindow,currentPlayableWindow) && isPlayWindowInstanceNotChanged(needPlayWindow,currentPlayableWindow)) {
-            playManager.resume();
+        if (isWindowIndexNotChanged(needPlayWindow, currentPlayableWindow) && isPlayWindowInstanceNotChanged(needPlayWindow, currentPlayableWindow)) {
+            playManager.onAttach(needPlayWindow);
             return;
         }
 
         if (currentPlayableWindow != null) {
-            playManager.stopPlay();
+            playManager.onDetach(currentPlayableWindow);
         }
 
         if (needPlayWindow == null) {
             return;
         }
-        playManager.setPlayableWindow(needPlayWindow);
-        playManager.play();
+        playManager.onAttach(needPlayWindow);
     }
 
 
