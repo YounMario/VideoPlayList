@@ -31,17 +31,7 @@ public class PlayWindowScrollerListener extends RecyclerView.OnScrollListener {
         mLastScroll = dy > 0;
     }
 
-
-    @Override
-    public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-        if (newState != RecyclerView.SCROLL_STATE_IDLE) {
-            return;
-        }
-        mPlayManager.onScrollFinished(mLastScroll);
-
-        mPlayableWindows.clear();
-        PlayableWindow currentPlayableWindow = mPlayManager.getCurrentPlayableWindow();
-
+    private PlayableWindow findNeedPlayWindow(RecyclerView recyclerView) {
         int firstPosition = RecyclerView.NO_POSITION;
         int lastPosition = RecyclerView.NO_POSITION;
 
@@ -64,9 +54,19 @@ public class PlayWindowScrollerListener extends RecyclerView.OnScrollListener {
             }
         }
 
+        return findNeedPlayWindowInArray(lastPosition, recyclerView.getAdapter().getItemCount());
+    }
 
-        PlayableWindow needPlayWindow = findNeedPlay(lastPosition, recyclerView.getAdapter().getItemCount());
 
+    @Override
+    public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+        if (newState != RecyclerView.SCROLL_STATE_IDLE) {
+            return;
+        }
+        mPlayManager.onScrollFinished(mLastScroll);
+        mPlayableWindows.clear();
+        PlayableWindow currentPlayableWindow = mPlayManager.getCurrentPlayableWindow();
+        PlayableWindow needPlayWindow = findNeedPlayWindow(recyclerView);
 
         if (isWindowIndexNotChanged(needPlayWindow, currentPlayableWindow) && isPlayWindowInstanceNotChanged(needPlayWindow, currentPlayableWindow)) {
             mPlayManager.onAttach(needPlayWindow);
@@ -84,12 +84,12 @@ public class PlayWindowScrollerListener extends RecyclerView.OnScrollListener {
     }
 
 
-    private PlayableWindow findNeedPlay(int lastPosition, int recycleViewItemCount) {
+    private PlayableWindow findNeedPlayWindowInArray(int lastPosition, int recycleViewItemCount) {
         //not found playable window
         if (mPlayableWindows.size() == 0) {
             return null;
         }
-        //last item invisible return firstPlayable Position
+        //if last item invisible return firstPlayable Position
         int lastIndex = mPlayableWindows.size() - 1;
         PlayableWindow lastPlayableWindow = mPlayableWindows.get(lastIndex);
 
