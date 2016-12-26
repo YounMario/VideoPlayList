@@ -9,9 +9,10 @@ import android.view.TextureView;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.example.videoplaylist.App;
 import com.example.videoplaylist.R;
-import com.example.videoplaylist.video.adapter.VideoListAdapter;
 import com.example.videoplaylist.video.anim.AnimationUtils;
 import com.example.videoplaylist.video.bean.VideoInfo;
 import com.example.videoplaylist.video.player.ExoVideoPlayManager;
@@ -20,6 +21,7 @@ import com.example.videoplaylist.video.player.manager.VideoPlayManager;
 import com.example.videoplaylist.video.utils.ThreadUtils;
 import com.example.videoplaylist.video.utils.ViewUitls;
 import com.example.videoplaylist.video.widget.VideoPlayerBottomBar;
+import com.squareup.picasso.Picasso;
 
 
 /**
@@ -40,6 +42,7 @@ public class VideoItemHolder extends RecyclerView.ViewHolder implements Playable
     private ImageView coverImageView;
     private VideoPlayerBottomBar videoPlayerBottomBar;
     private FrameLayout frameCover;
+    private TextView mTxtDescription;
 
 
     private float mLastVisibleArea;
@@ -69,6 +72,7 @@ public class VideoItemHolder extends RecyclerView.ViewHolder implements Playable
         videoPlayerBottomBar = (VideoPlayerBottomBar) itemView.findViewById(R.id.video_play_bottom_bar);
         frameCover = (FrameLayout) itemView.findViewById(R.id.frame_cover);
         ivLoading = (ImageView) itemView.findViewById(R.id.img_buffering);
+        mTxtDescription = (TextView) itemView.findViewById(R.id.txt_desc);
         mExoPlayer = new ExoVideoPlayManager();
         mExoPlayer.setPlayableWindow(this);
 
@@ -118,6 +122,31 @@ public class VideoItemHolder extends RecyclerView.ViewHolder implements Playable
 //                Log.i(TAG_TEXTURE, "is surface texture update:" + position);
             }
         });
+
+
+        btnPlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mVideoPlayManager.getCurrentPlayableWindow() == VideoItemHolder.this) {
+                    if (mVideoPlayManager.isPlayState()) {
+                        mVideoPlayManager.pause();
+                        btnPlay.setImageResource(R.drawable.icon_play);
+                    } else if (mVideoPlayManager.isPauseState()) {
+                        mVideoPlayManager.resume();
+                        btnPlay.setImageResource(R.drawable.icon_pause);
+                    }
+                }
+            }
+        });
+
+        getVideoView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mVideoPlayManager.getCurrentPlayableWindow() == VideoItemHolder.this) {
+                    onFocus();
+                }
+            }
+        });
     }
 
     public View getView(int resId) {
@@ -127,7 +156,7 @@ public class VideoItemHolder extends RecyclerView.ViewHolder implements Playable
     @Override
     public boolean canPlay() {
         mLastVisibleArea = ViewUitls.visibleArea(this, mItemView.getParent());
-        return  mLastVisibleArea > DEFAULT_OFFSET;
+        return mLastVisibleArea > DEFAULT_OFFSET;
     }
 
     @Override
@@ -140,10 +169,6 @@ public class VideoItemHolder extends RecyclerView.ViewHolder implements Playable
         return textureView;
     }
 
-    @Override
-    public View getVideoPlayBtn() {
-        return btnPlay;
-    }
 
     @Override
     public Surface getPlayableSurface() {
@@ -180,10 +205,6 @@ public class VideoItemHolder extends RecyclerView.ViewHolder implements Playable
         videoPlayerBottomBar.setVisibility(View.VISIBLE);
     }
 
-    @Override
-    public void updateUiToResumeState() {
-        btnPlay.setVisibility(View.GONE);
-    }
 
     @Override
     public void updateUiToNormalState() {
@@ -258,15 +279,6 @@ public class VideoItemHolder extends RecyclerView.ViewHolder implements Playable
         coverImageView.setVisibility(View.GONE);
     }
 
-    @Override
-    public void setClipType(int type) {
-
-    }
-
-    @Override
-    public int getClipType() {
-        return 0;
-    }
 
     @Override
     public float getWindowLastCalculateArea() {
@@ -362,6 +374,16 @@ public class VideoItemHolder extends RecyclerView.ViewHolder implements Playable
     @Override
     public void updateVideoItem(VideoInfo videoItem) {
         this.mVideoItem = videoItem;
+        if (mVideoPlayManager.getCurrentPlayableWindow() != this) {
+            btnPlay.setImageResource(R.drawable.icon_pause);
+            updateUiToNormalState();
+        }
+        Picasso.with(App.getInstance())
+                .load(videoItem.getThumbnailUrl())
+                .fit()
+                .into(coverImageView);
+
+        mTxtDescription.setText(videoItem.getDesc());
     }
 
     @Override

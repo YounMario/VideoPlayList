@@ -26,4 +26,9 @@ public interface VideoPlayManager {
     void onAttach(PlayableWindow needPlayWindow);
 
     void onDetach(PlayableWindow currentPlayableWindow);
+
+    boolean isPlayState();
+
+    boolean isPauseState();
+
 }

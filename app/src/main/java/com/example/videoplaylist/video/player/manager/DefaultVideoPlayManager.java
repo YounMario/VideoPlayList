@@ -18,8 +18,6 @@ public class DefaultVideoPlayManager implements VideoPlayManager {
 
     private static final String TAG = "DefaultVideoPlayManager";
 
-    private static final int STATE_INIT = -1;
-    private static final int STATE_INITED = 0;
     private static final int STATE_NORMAL = 1;
     private static final int STATE_PLAY = 2;
     private static final int STATE_PAUSE = 3;
@@ -28,6 +26,10 @@ public class DefaultVideoPlayManager implements VideoPlayManager {
     private int mCurrentState;
     private PlayableWindow mCurrentWindow;
 
+    public DefaultVideoPlayManager() {
+        super();
+        mCurrentState = STATE_NORMAL;
+    }
 
     @Override
     public void play() {
@@ -58,7 +60,10 @@ public class DefaultVideoPlayManager implements VideoPlayManager {
 
     @Override
     public void pause() {
-
+        setCurrentState(STATE_PAUSE);
+        if (mCurrentWindow != null) {
+            mCurrentWindow.pause();
+        }
     }
 
     @Override
@@ -68,7 +73,10 @@ public class DefaultVideoPlayManager implements VideoPlayManager {
 
     @Override
     public void resume() {
-
+        setCurrentState(STATE_PLAY);
+        if (mCurrentWindow != null) {
+            mCurrentWindow.resume();
+        }
     }
 
     @Override
@@ -97,6 +105,17 @@ public class DefaultVideoPlayManager implements VideoPlayManager {
     public void onDetach(PlayableWindow currentPlayableWindow) {
         stopPlay();
     }
+
+    @Override
+    public boolean isPlayState() {
+        return mCurrentState == STATE_PLAY;
+    }
+
+    @Override
+    public boolean isPauseState() {
+        return mCurrentState == STATE_PAUSE;
+    }
+
 
     private String getPlayAblePath() {
         if (mCurrentWindow == null) {

@@ -15,15 +15,14 @@ import java.util.ArrayList;
 
 public class PlayWindowScrollerListener extends RecyclerView.OnScrollListener {
 
-    private static final String TAG = "ScrollerListener";
 
-    private VideoPlayManager playManager;
-    private ArrayList<PlayableWindow> playableWindows;
+    private VideoPlayManager mPlayManager;
+    private ArrayList<PlayableWindow> mPlayableWindows;
     private boolean mLastScroll;
 
     public PlayWindowScrollerListener(VideoPlayManager playManager) {
-        this.playManager = playManager;
-        playableWindows = new ArrayList<>();
+        this.mPlayManager = playManager;
+        mPlayableWindows = new ArrayList<>();
     }
 
     @Override
@@ -38,10 +37,10 @@ public class PlayWindowScrollerListener extends RecyclerView.OnScrollListener {
         if (newState != RecyclerView.SCROLL_STATE_IDLE) {
             return;
         }
-        playManager.onScrollFinished(mLastScroll);
+        mPlayManager.onScrollFinished(mLastScroll);
 
-        playableWindows.clear();
-        PlayableWindow currentPlayableWindow = playManager.getCurrentPlayableWindow();
+        mPlayableWindows.clear();
+        PlayableWindow currentPlayableWindow = mPlayManager.getCurrentPlayableWindow();
 
         int firstPosition = RecyclerView.NO_POSITION;
         int lastPosition = RecyclerView.NO_POSITION;
@@ -60,7 +59,7 @@ public class PlayWindowScrollerListener extends RecyclerView.OnScrollListener {
                 //update all visible item position
                 playerWindow.setWindowIndex(i);
                 if (playerWindow.canPlay()) {
-                    playableWindows.add(playerWindow);
+                    mPlayableWindows.add(playerWindow);
                 }
             }
         }
@@ -70,38 +69,38 @@ public class PlayWindowScrollerListener extends RecyclerView.OnScrollListener {
 
 
         if (isWindowIndexNotChanged(needPlayWindow, currentPlayableWindow) && isPlayWindowInstanceNotChanged(needPlayWindow, currentPlayableWindow)) {
-            playManager.onAttach(needPlayWindow);
+            mPlayManager.onAttach(needPlayWindow);
             return;
         }
 
         if (currentPlayableWindow != null) {
-            playManager.onDetach(currentPlayableWindow);
+            mPlayManager.onDetach(currentPlayableWindow);
         }
 
         if (needPlayWindow == null) {
             return;
         }
-        playManager.onAttach(needPlayWindow);
+        mPlayManager.onAttach(needPlayWindow);
     }
 
 
     private PlayableWindow findNeedPlay(int lastPosition, int recycleViewItemCount) {
         //not found playable window
-        if (playableWindows.size() == 0) {
+        if (mPlayableWindows.size() == 0) {
             return null;
         }
         //last item invisible return firstPlayable Position
-        int lastIndex = playableWindows.size() - 1;
-        PlayableWindow lastPlayableWindow = playableWindows.get(lastIndex);
+        int lastIndex = mPlayableWindows.size() - 1;
+        PlayableWindow lastPlayableWindow = mPlayableWindows.get(lastIndex);
 
         //if lastPosition is not the last of recycleView item
         if (lastPosition != recycleViewItemCount - 1 || lastPlayableWindow.getWindowIndex() < lastPosition) {
-            return playableWindows.get(0);
+            return mPlayableWindows.get(0);
         }
 
         //last visible item must be not null here
 
-        PlayableWindow secondLastPlayableWindow = playableWindows.get(lastIndex - 1);
+        PlayableWindow secondLastPlayableWindow = mPlayableWindows.get(lastIndex - 1);
 
         //if secondLastPlayableWindow's area larger than LastPlayableWindow return secondLastPlayableWindow
         if (secondLastPlayableWindow != null) {

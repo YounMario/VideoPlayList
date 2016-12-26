@@ -322,8 +322,6 @@ public class ExoVideoPlayManager implements DemoPlayer.Listener {
 
         Matrix matrix = new Matrix();
         matrix.setScale(scaledX * scale, scaledY * scale, pivotPointX, pivotPointY);
-        float offset = ClipHelper.getTranslateOffset(currentWindow.getClipType(), width, height, viewWidth, viewHeight);
-        matrix.postTranslate(0, offset);
         textureView.setTransform(matrix);
     }
 

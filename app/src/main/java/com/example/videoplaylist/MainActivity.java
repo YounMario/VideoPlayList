@@ -20,6 +20,9 @@ public class MainActivity extends AppCompatActivity {
     private VideoListAdapter mAdapter;
     private VideoPlayManager mVideoPlayManager;
 
+    private PlayWindowScrollerListener mScrollerListener;
+    private LinearLayoutManager mLinearLayoutManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,10 +33,10 @@ public class MainActivity extends AppCompatActivity {
     private void initView() {
         mRecyclerView = (RecyclerView) findViewById(R.id.recycle_view);
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(linearLayoutManager);
+        mLinearLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLinearLayoutManager);
         ArrayList<VideoInfo> videoInfos = new ArrayList<>();
-        for (int i=0;i<10;i++){
+        for (int i = 0; i < 10; i++) {
             VideoInfo info = new VideoInfo();
             info.setDesc("des");
             //http://clips.vorwaerts-gmbh.de/VfE_html5.mp4
@@ -48,19 +51,28 @@ public class MainActivity extends AppCompatActivity {
         ((SimpleItemAnimator) mRecyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
         mRecyclerView.setAdapter(mAdapter);
         mAdapter.setData(videoInfos);
-        mAdapter.setLinearLayout(linearLayoutManager);
+        mAdapter.setLinearLayout(mLinearLayoutManager);
         mAdapter.setVideoPlayManager(mVideoPlayManager);
-        mRecyclerView.addOnScrollListener(new PlayWindowScrollerListener(mVideoPlayManager));
+        mScrollerListener = new PlayWindowScrollerListener(mVideoPlayManager);
+        mRecyclerView.addOnScrollListener(mScrollerListener);
     }
+
 
     @Override
     protected void onResume() {
         super.onResume();
+        mRecyclerView.post(new Runnable() {
+            @Override
+            public void run() {
+                mScrollerListener.onScrollStateChanged(mRecyclerView, RecyclerView.SCROLL_STATE_IDLE);
+            }
+        });
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        mVideoPlayManager.pause();
     }
 
     @Override

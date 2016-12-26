@@ -3,7 +3,6 @@ package com.example.videoplaylist.video.player;
 import android.view.Surface;
 import android.view.View;
 
-import com.example.videoplaylist.video.bean.VideoInfo;
 import com.example.videoplaylist.video.player.manager.VideoPlayManager;
 
 /**
@@ -18,15 +17,12 @@ public interface PlayableWindow<T> {
 
     View getVideoView();
 
-    View getVideoPlayBtn();
 
     Surface getPlayableSurface();
 
     void updateUiToPlayState();
 
     void updateUiToPauseState();
-
-    void updateUiToResumeState();
 
     void updateUiToNormalState();
 
@@ -41,10 +37,6 @@ public interface PlayableWindow<T> {
     void showCover();
 
     void hideCover();
-
-    void setClipType(int type);
-
-    int getClipType();
 
     float getWindowLastCalculateArea();
 
