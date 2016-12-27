@@ -44,6 +44,7 @@ public class VideoItemHolder extends RecyclerView.ViewHolder implements Playable
     private FrameLayout frameCover;
     private TextView mTxtDescription;
 
+    private ImageView btnFullScreen;
 
     private float mLastVisibleArea;
     private int mCurrentIndex;
@@ -73,8 +74,16 @@ public class VideoItemHolder extends RecyclerView.ViewHolder implements Playable
         frameCover = (FrameLayout) itemView.findViewById(R.id.frame_cover);
         ivLoading = (ImageView) itemView.findViewById(R.id.img_buffering);
         mTxtDescription = (TextView) itemView.findViewById(R.id.txt_desc);
+        btnFullScreen = (ImageView) itemView.findViewById(R.id.btn_full);
         mExoPlayer = new ExoVideoPlayManager();
         mExoPlayer.setPlayableWindow(this);
+
+        btnFullScreen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
 
         textureView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
             @Override
