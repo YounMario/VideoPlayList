@@ -137,10 +137,10 @@ public class VideoItemHolder extends RecyclerView.ViewHolder implements Playable
             @Override
             public void onClick(View v) {
                 if (mVideoPlayManager.getCurrentPlayableWindow() == VideoItemHolder.this) {
-                    if (mVideoPlayManager.isPlayState()) {
+                    if (mVideoPlayManager.isPlaying()) {
                         mVideoPlayManager.pause();
                         btnPlay.setImageResource(R.drawable.icon_play);
-                    } else if (mVideoPlayManager.isPauseState()) {
+                    } else if (mVideoPlayManager.isPlaying()) {
                         mVideoPlayManager.resume();
                         btnPlay.setImageResource(R.drawable.icon_pause);
                     }

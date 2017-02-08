@@ -15,6 +15,8 @@ public interface VideoPlayManager {
 
     void pause();
 
+    void setPlayableWindow(PlayableWindow window);
+
     PlayableWindow getCurrentPlayableWindow();
 
     void resume();
@@ -23,12 +25,6 @@ public interface VideoPlayManager {
 
     void release();
 
-    void onAttach(PlayableWindow needPlayWindow);
-
-    void onDetach(PlayableWindow currentPlayableWindow);
-
-    boolean isPlayState();
-
-    boolean isPauseState();
+    boolean isPlaying();
 
 }

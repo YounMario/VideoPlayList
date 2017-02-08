@@ -67,15 +67,19 @@ public class DefaultVideoPlayManager implements VideoPlayManager {
     }
 
     @Override
+    public void setPlayableWindow(PlayableWindow window) {
+        mCurrentWindow = window;
+    }
+
+    @Override
     public PlayableWindow getCurrentPlayableWindow() {
         return mCurrentWindow;
     }
 
     @Override
     public void resume() {
-        setCurrentState(STATE_PLAY);
-        if (mCurrentWindow != null) {
-            mCurrentWindow.resume();
+        if (mCurrentState == STATE_NORMAL || mCurrentState == STATE_PAUSE) {
+            play();
         }
     }
 
@@ -84,7 +88,6 @@ public class DefaultVideoPlayManager implements VideoPlayManager {
 
     }
 
-    @Override
     public void release() {
         stopPlay();
         if (mCurrentWindow != null) {
@@ -94,6 +97,10 @@ public class DefaultVideoPlayManager implements VideoPlayManager {
     }
 
     @Override
+    public boolean isPlaying() {
+        return mCurrentState == STATE_PLAY;
+    }
+
     public void onAttach(PlayableWindow needPlayWindow) {
         mCurrentWindow = needPlayWindow;
         if (mCurrentState == STATE_NORMAL || mCurrentState == STATE_PAUSE) {
@@ -101,17 +108,14 @@ public class DefaultVideoPlayManager implements VideoPlayManager {
         }
     }
 
-    @Override
     public void onDetach(PlayableWindow currentPlayableWindow) {
         stopPlay();
     }
 
-    @Override
     public boolean isPlayState() {
         return mCurrentState == STATE_PLAY;
     }
 
-    @Override
     public boolean isPauseState() {
         return mCurrentState == STATE_PAUSE;
     }
